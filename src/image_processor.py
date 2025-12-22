@@ -49,6 +49,25 @@ class ImageProcessor:
         )
         print(f"Successfully indexed image {filename}")
 
+    def process_directory(self, source_dir):
+        """
+        批量处理目录下的所有图像文件
+        """
+        if not os.path.exists(source_dir):
+            print(f"Error: Directory {source_dir} not found.")
+            return
+
+        count = 0
+        valid_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'}
+        for root, dirs, files in os.walk(source_dir):
+            for file in files:
+                if os.path.splitext(file)[1].lower() in valid_extensions:
+                    file_path = os.path.join(root, file)
+                    print(f"Found Image: {file_path}")
+                    self.process_image(file_path)
+                    count += 1
+        print(f"Batch processing complete. Processed {count} images.")
+
     def search_by_text(self, query_text, n_results=3):
         """
         以文搜图

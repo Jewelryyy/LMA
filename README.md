@@ -1,4 +1,4 @@
-# 本地多模态AI智能体
+# Local Multimodal AI Agent
 
 这是一个基于本地轻量级模型的智能多模态助手项目。它利用 `SentenceTransformers`、`CLIP` 和 `ChromaDB` 实现了智能文献管理和以文搜图功能，所有数据和模型均在本地运行，保护隐私且无需联网。
 
@@ -33,7 +33,15 @@
 
 项目通过 `main.py` 提供统一的命令行接口。
 
-### 📚 文献管理
+### 😊 交互式模式 (推荐)
+
+直接运行 `main.py` 即可进入交互式菜单，支持持久化运行，避免重复加载模型。
+
+```bash
+python main.py
+```
+
+### 📚 文献管理 (命令行模式)
 
 #### 1. 添加单个文献
 将 PDF 添加到库中。你可以手动指定主题，也可以让系统自动提取。
@@ -53,7 +61,7 @@
 扫描指定目录下的所有 PDF 文件，自动提取关键词并整理归档。
 
 ```bash
-python main.py batch_add_paper "./Papers/"
+python main.py batch_add_paper "C:/Downloads/Papers/"
 ```
 
 #### 3. 搜索文献
@@ -72,7 +80,14 @@ python main.py search_paper "how to train large language models"
 python main.py index_image "path/to/photo.jpg"
 ```
 
-#### 2. 以文搜图
+#### 2. 批量索引图像
+扫描指定目录下的所有图片文件（支持 jpg, png, bmp, gif, webp），建立索引。
+
+```bash
+python main.py batch_index_image "path/to/images_folder/"
+```
+
+#### 3. 以文搜图
 用文字描述来搜索图片。
 
 ```bash

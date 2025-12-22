@@ -32,8 +32,8 @@ class DocumentProcessor:
         # 匹配常见的关键词引导词
         # 匹配模式：Keywords: word1, word2... 直到换行或句号
         patterns = [
-            r"(?:Keywords|Key words|Index Terms)\s*[:]\s*(.*?)(?:\n\n|\.|$|\n[A-Z])",
-            r"(?:KEYWORDS|KEY WORDS)\s*[:]\s*(.*?)(?:\n\n|\.|$|\n[A-Z])"
+            r"(?:Keywords|Key words|Index Terms)\s*[:\-—–]\s*(.*?)(?:\n\n|\.|$|\n[A-Z])",
+            r"(?:KEYWORDS|KEY WORDS)\s*[:\-—–]\s*(.*?)(?:\n\n|\.|$|\n[A-Z])"
         ]
         
         for pattern in patterns:
