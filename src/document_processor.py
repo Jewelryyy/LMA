@@ -81,7 +81,7 @@ class DocumentProcessor:
         full_text = self.extract_text_from_pdf(pdf_path)
         # 截断文本以适应模型限制 (简单处理，取前500个字符作为摘要用于嵌入，实际可做分块)
         # all-MiniLM-L6-v2 max seq length is 256 tokens. 
-        # 这里我们取前 1000 字符作为代表性内容进行嵌入
+        # 取前 1000 字符作为代表性内容进行嵌入
         text_for_embedding = full_text[:1000]
 
         # 2. 生成嵌入

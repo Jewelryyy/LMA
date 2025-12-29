@@ -41,6 +41,15 @@
 python main.py
 ```
 
+### 🌐 Web 界面 (Gradio)
+
+如果您更喜欢图形化界面，可以启动 Gradio Web App：
+
+```bash
+python gradio_app.py
+```
+启动后，在浏览器访问终端显示的 URL（通常是 `http://127.0.0.1:7860`）。
+
 ### 📚 文献管理 (命令行模式)
 
 #### 1. 添加单个文献
