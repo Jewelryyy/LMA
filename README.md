@@ -1,4 +1,4 @@
-# Local Multimodal AI Agent
+<h1>Local Multimodal AI Agent</h1>
 
 这是一个基于本地轻量级模型的智能多模态助手项目。它利用 `SentenceTransformers`、`CLIP` 和 `ChromaDB` 实现了智能文献管理和以文搜图功能，所有数据和模型均在本地运行，保护隐私且无需联网。
 
@@ -106,7 +106,7 @@ python main.py search_image "a dog playing in the park"
 ## 📂 项目结构
 
 ```text
-Experiment2/
+LMA/
 ├── docs/                 # [自动生成] 归档后的 PDF 文献库（按主题分类）
 ├── images/               # 图片库目录
 ├── embeddings/           # [自动生成] ChromaDB 向量数据库文件
