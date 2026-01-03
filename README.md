@@ -1,4 +1,4 @@
-<h1>Local Multimodal AI Agent</h1>
+<h1 align="center">Local Multimodal AI Agent</h1>
 
 这是一个基于本地轻量级模型的智能多模态助手项目。它利用 `SentenceTransformers`、`CLIP` 和 `ChromaDB` 实现了智能文献管理和以文搜图功能，所有数据和模型均在本地运行，保护隐私且无需联网。
 
