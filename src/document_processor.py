@@ -2,7 +2,7 @@ import os
 import shutil
 import re
 import fitz  # PyMuPDF
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
 from .db_manager import DBManager
 
 class DocumentProcessor:
@@ -14,6 +14,18 @@ class DocumentProcessor:
         print(f"Loading text embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
         self.docs_root = "docs"
+        
+        # 预定义常见主题用于语义分类 (可根据需要扩展)
+        self.predefined_topics = [
+            "Computer Vision", "Natural Language Processing", 
+            "Reinforcement Learning", "Multimodal Learning",
+            "Generative AI", "Robotics", "Quantization",
+            "Deep Neural Networks", "Audio Processing",
+            "Machine Learning Theory", "Data Science"
+        ]
+        # 预计算主题的 Embeddings 以加速分类
+        print("Pre-computing topic embeddings for classification...")
+        self.topic_embeddings = self.model.encode(self.predefined_topics)
 
     def extract_text_from_pdf(self, pdf_path):
         """
@@ -48,6 +60,20 @@ class DocumentProcessor:
         
         return []
 
+    def classify_paper(self, text_embedding):
+        """
+        基于语义相似度将论文归类到预定义主题
+        """
+        # 计算与预定义主题的相似度
+        hits = util.cos_sim(text_embedding, self.topic_embeddings)[0]
+        
+        # 找到相似度最高的主题
+        best_idx = hits.argmax().item()
+        best_score = hits[best_idx].item()
+        best_topic = self.predefined_topics[best_idx]
+        
+        return best_topic, best_score
+
     def process_directory(self, source_dir):
         """
         批量处理目录下的所有 PDF 文件
@@ -81,30 +107,39 @@ class DocumentProcessor:
         full_text = self.extract_text_from_pdf(pdf_path)
         # 截断文本以适应模型限制 (简单处理，取前500个字符作为摘要用于嵌入，实际可做分块)
         # all-MiniLM-L6-v2 max seq length is 256 tokens. 
-        # 取前 1000 字符作为代表性内容进行嵌入
+        # 这里我们取前 1000 字符作为代表性内容进行嵌入
         text_for_embedding = full_text[:1000]
 
-        # 2. 生成嵌入
-        embedding = self.model.encode(text_for_embedding).tolist()
+        # 2. 生成嵌入 (先获取 numpy array 用于分类，再转 list 存库)
+        embedding_np = self.model.encode(text_for_embedding)
+        embedding = embedding_np.tolist()
 
         # 3. 处理 Topics 和文件移动
+        # 自动提取关键词用于 Metadata (即使有语义分类，保留原始关键词也很有用)
+        extracted_keywords = self.extract_keywords(full_text[:5000])
+        
         if topics_str:
             topics = [t.strip() for t in topics_str.split(',') if t.strip()]
         else:
-            # 自动提取
-            print("Attempting to extract keywords...")
-            topics = self.extract_keywords(full_text[:3000]) # 仅在前3000字符中查找
-            if topics:
-                print(f"Extracted keywords: {topics}")
-                topics_str = ",".join(topics)
-            else:
-                print("No keywords found. Using 'Uncategorized'.")
-                topics = []
-                topics_str = ""
+            topics = extracted_keywords
+            topics_str = ",".join(topics) if topics else ""
 
-        primary_topic = topics[0] if topics else "Uncategorized"
-        # 简单的文件名清理，避免非法字符作为文件夹名
-        primary_topic = "".join([c for c in primary_topic if c.isalnum() or c in (' ', '_', '-')]).strip()
+        # 语义分类：计算与预定义主题的相似度
+        semantic_topic, score = self.classify_paper(embedding_np)
+        print(f"Semantic classification: {semantic_topic} (Score: {score:.4f})")
+
+        # 确定主分类文件夹
+        primary_topic = "Uncategorized"
+        
+        # 策略：如果语义匹配分数较高(>0.25)，优先使用语义分类
+        # 否则，如果提取到了关键词，尝试使用第一个关键词
+        if score > 0.25:
+            primary_topic = semantic_topic
+        elif extracted_keywords:
+            primary_topic = extracted_keywords[0]
+            # 简单的文件名清理
+            primary_topic = "".join([c for c in primary_topic if c.isalnum() or c in (' ', '_', '-')]).strip()
+        
         if not primary_topic:
             primary_topic = "Uncategorized"
         
